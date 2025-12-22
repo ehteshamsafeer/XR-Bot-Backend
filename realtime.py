@@ -7,6 +7,7 @@ class RealtimeAI:
         self.ws = None
 
     async def connect(self):
+        print("🔑 OPENAI_API_KEY detected:", os.getenv('OPENAI_API_KEY'))
         self.ws = await websockets.connect(
     "wss://api.openai.com/v1/realtime"
     "?model=gpt-realtime-mini-2025-12-15",
