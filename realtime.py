@@ -7,16 +7,14 @@ class RealtimeAI:
         self.ws = None
 
     async def connect(self):
-        OPENAI_API_KEY="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"
-        print("🔑 OPENAI_API_KEY detected:", OPENAI_API_KEY)
         self.ws = await websockets.connect(
-    "wss://api.openai.com/v1/realtime"
-    "?model=gpt-realtime-mini-2025-12-15",
+            "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
             additional_headers={
-                "Authorization": f"Bearer {OPENAI_API_KEY}",
+                "Authorization": "Bearer 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",
                 "OpenAI-Beta": "realtime=v1",
             }
         )
+
         print("🤖 Connected to OpenAI Realtime")
 
     async def send_audio(self, base64_audio: str):
