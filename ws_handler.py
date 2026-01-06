@@ -2,10 +2,9 @@ import asyncio
 import json
 from fastapi import WebSocket
 from realtime import RealtimeAI
-
+ai_is_speaking = False
 
 async def handle_unity_ws(ws: WebSocket):
-    current_step = 1
     await ws.accept()
     print("✅ Unity connected")
 
@@ -14,38 +13,37 @@ async def handle_unity_ws(ws: WebSocket):
 
     audio_chunks = []
     response_requested = False
-    async def send_step_instruction():
-        nonlocal current_step
-
-        if current_step == 1:
-            await ai.send_text(
-                "Step one. Place the connector on the base."
+    async def send_step_instruction(attached_obj):
+        instruction = (
+            f"{attached_obj}"
+            f"Let's proceed to the next step."
             )
 
-        elif current_step == 2:
-            await ai.send_text(
-                "Step two. Place the cap on top of the connector."
-            )
+        # 1️⃣ Send instruction text
+        await ai.send_text(instruction)
 
-        elif current_step == 3:
-            await ai.send_text(
-                "Assembly complete. Good work."
-            )
-
-    await send_step_instruction()
+        # 2️⃣ Explicitly request a spoken response
+       # await ai.send_text({
+        #    "type": "response.create",
+         #   "response": {
+          #      "modalities": ["audio", "text"],
+           #     "instructions": "Respond naturally to the user."
+           # }
+       # })
+        
+    #await send_step_instruction(data["message"])
 
 
     async def unity_to_ai():
         nonlocal response_requested
-        nonlocal current_step
 
         try:
             while True:
                 msg = await ws.receive_text()
                 data = json.loads(msg)
-                if data["type"] == "step_completed":
-                    current_step += 1
-                    await send_step_instruction()
+                if data["type"] == "task_completed":
+                    #await ai.cancel_response()
+                    await send_step_instruction(data["message"])
 
                 if data["type"] == "audio_input":
                     # Send mic audio to OpenAI
@@ -85,10 +83,15 @@ async def handle_unity_ws(ws: WebSocket):
                         "type": "audio_output",
                         "data": full_audio
                     }))
+                
 
                     # Reset for next utterance
                     audio_chunks.clear()
                     response_requested = False
+                await ws.send_text(json.dumps({
+                        "type": "ai_done",
+                        "data": "Resume Mic Streaming"
+                    }))
 
         except Exception as e:
             print("❌ OpenAI disconnected:", e)
