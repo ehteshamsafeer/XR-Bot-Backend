@@ -1,3 +1,14 @@
 .env
 __pycache__
 __pycache__
+*.csproj
+*.sln
+Frontend/MR AI Chatbot/Temp
+Frontend/MR AI Chatbot/obj
+Frontend/MR AI Chatbot/MR AI Chatbot_BurstDebugInformation_DoNotShip
+Frontend/MR AI Chatbot/Logs
+Frontend/MR AI Chatbot/Library
+Frontend/MR AI Chatbot/.vscode
+Frontend/MR AI Chatbot/.utmp
+Frontend/MR AI Chatbot/.vs
+Frontend/MR AI Chatbot/build.apk
